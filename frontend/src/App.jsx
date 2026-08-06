@@ -18,6 +18,10 @@ import {
 } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
 function App() {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([]);
@@ -105,7 +109,7 @@ useEffect(() => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/validate-key",
+        `${API_URL}/api/validate-key`,
         {
           apiKey: savedKey,
         }
@@ -150,7 +154,7 @@ const fetchDocuments = async () => {
     setDocumentsLoading(true);
 
     const response = await axios.get(
-      "http://localhost:5000/api/documents"
+      `${API_URL}/api/documents`
     );
 
     setDocuments(response.data.documents || []);
@@ -224,7 +228,7 @@ const deleteDocument = async (doc, event) => {
     const doc = deleteTarget;
 
     await axios.delete(
-      `http://localhost:5000/api/documents/${doc.documentId}`
+       `${API_URL}/api/documents/${doc.documentId}`
     );
 
     // Remove chat history
@@ -311,7 +315,7 @@ const uploadPdf = async () => {
     // ==========================================
 
     eventSource = new EventSource(
-      `http://localhost:5000/api/index-progress/${uploadId}`
+       `${API_URL}/api/index-progress/${uploadId}`
     );
 
     await new Promise((resolve, reject) => {
@@ -406,15 +410,7 @@ const uploadPdf = async () => {
 
  
 
-    // eventSource.onerror = (error) => {
-    //   console.warn(
-    //     "⚠️ Progress connection closed/error:",
-    //     error
-    //   );
-
-    //   eventSource?.close();
-    // };
-
+    
     // ==========================================
     // PREPARE PDF
     // ==========================================
@@ -431,7 +427,7 @@ const uploadPdf = async () => {
     // ==========================================
 
     const response = await axios.post(
-      "http://localhost:5000/api/upload",
+       `${API_URL}/api/upload`,
       formData,
       {
         headers: {
@@ -572,7 +568,7 @@ const connectGeminiApi = async () => {
     setApiKeyError("");
 
     const response = await axios.post(
-      "http://localhost:5000/api/validate-key",
+       `${API_URL}/api/validate-key`,
       {
         apiKey: geminiApiKey.trim(),
       }
@@ -653,7 +649,7 @@ const connectGeminiApi = async () => {
 
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/query",
+       `${API_URL}/api/query`,
       {
         question: currentQuestion, // FIX
         documentId,
@@ -1115,25 +1111,7 @@ return (
           onSubmit={askQuestion}
         >
 
-          {/* <input
-            type="text"
-            placeholder={
-              !apiKeyConnected
-                ? "Connect your Gemini API key first..."
-                : documentId
-                ? `Ask about ${documentName}...`
-                : "Select or upload a PDF..."
-            }
-            value={question}
-            onChange={(e) =>
-              setQuestion(e.target.value)
-            }
-            disabled={
-              loading ||
-              !documentId ||
-              !apiKeyConnected
-            }
-          /> */}
+          
 
           <input
   value={question}
