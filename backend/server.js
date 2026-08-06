@@ -61,46 +61,51 @@ const pineconeIndex = pinecone.Index(
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://pdf-rag-assistant-7qgf.vercel.app",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Postman/server-to-server requests
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(
+        new Error(`CORS blocked for origin: ${origin}`)
+      );
+    },
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "x-gemini-api-key",
+      "x-upload-id",
+    ],
   })
 );
+
 
 app.use(express.json());
 
 
 //multer
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "uploads");
-//   },
-
-//   filename: (req, file, cb) => {
-//     const uniqueName =
-//       Date.now() + "-" + file.originalname.replace(/\s+/g, "-");
-
-//     cb(null, uniqueName);
-//   },
-// });
-
-// const fileFilter = (req, file, cb) => {
-//   if (file.mimetype === "application/pdf") {
-//     cb(null, true);
-//   } else {
-//     cb(new Error("Only PDF files are allowed"), false);
-//   }
-// };
-
-// const upload = multer({
-//   storage,
-//   fileFilter,
-//   limits: {
-//     fileSize: 10 * 1024 * 1024,
-//   },
-// });
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
